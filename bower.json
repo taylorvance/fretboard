@@ -1,0 +1,21 @@
+{
+  "name": "guitar",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Taylor Vance"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper": "^0.11.5"
+  }
+}
