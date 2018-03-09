@@ -351,6 +351,27 @@ function drawModes() {
 		y += 2.5*buttonRadius;
 	}
 
+	// Chord Ornaments
+	x += modeWidth + 2.5*buttonRadius;
+	y = btnTopLeft.y;
+	var text = new paper.PointText(new paper.Point(x + modeWidth/2, y));
+	text.content = 'Ornaments';
+	text.justification = 'center';
+	text.fontSize = 20;
+	text.fontWeight = 'bold';
+	y += buttonRadius;
+	var chords = [
+		{name:'6', intervals:[0,4,7,9]},
+		{name:'7', intervals:[0,4,7,10]},
+		{name:'maj7', intervals:[0,4,7,11]},
+		{name:'add9', intervals:[0,2,4,7]},
+		{name:'add11', intervals:[0,4,5,7]},
+	];
+	for (var i = 0, len = chords.length; i < len; i++) {
+		var btn = new ModeButton(x, y, chords[i].name, chords[i].intervals);
+		y += 2.5*buttonRadius;
+	}
+
 	// Chromatic
 	x += modeWidth + 2.5*buttonRadius;
 	y = btnTopLeft.y;

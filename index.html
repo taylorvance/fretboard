@@ -4,6 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<title>fret</title>
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.11.5/paper-core.min.js"></script>
 		<script type="text/javascript" src="fretboard.js"></script>
 	</head>
@@ -16,5 +17,70 @@
 			}
 		</style>
 		<canvas id="myCanvas"></canvas>
+
+		<script charset="utf-8">
+			$(document).ready(function() {
+				$.ajax({
+					url: "scales.tsv",
+					dataType: "text"
+				}).done(function(data){
+					var rows = data.split(/\r?\n|\r/);
+					rows.forEach(function(row){
+						var cols = row.split('\t');
+						$('#scales').append('<option value="' + cols[1] + '">' + cols[0] + '</option>');
+					});
+				});
+
+				// Update selected degrees when a scale is selected from the dropdown.
+				$("#scales").change(function(){
+					DegreeButton.allDegrees.forEach(function(deg){
+						deg.disable();
+					});
+
+					// enable the appropriate degrees
+					var idxs = $(this).val();
+					for(i in idxs) {
+						if(idxs[i] == "1") {
+							DegreeButton.allDegrees[i].enable();
+						}
+					}
+				});
+
+				// Watch for changes to selected scale degrees and find any matching scales from the list.
+				var cachedDegrees;
+				setInterval(function(){
+					if(document.hasFocus()) {
+						var enabled = DegreeButton.enabledDegrees.map(function(deg){ return deg.myIndex; });
+						var current = "";
+						for(var idx = 0; idx < 12; idx++) {
+							if(enabled.indexOf(idx) !== -1) {
+								current += "1";
+							} else {
+								current += "0";
+							}
+						}
+						if(cachedDegrees != current) {
+							// Look for any matching scales in the list.
+							$('#matching-scales').html("");
+							$('#scales option[value="'+current+'"]').each(function(i){
+								$('#matching-scales').append("&nbsp;&nbsp;&nbsp;&nbsp;" + $(this).text());
+							});
+
+							cachedDegrees = current;
+						}
+					}
+				}, 2000);
+			});
+		</script>
+		<div>
+			<i>This isn't as clean an interface as the above, but I wanted more scales. Deal with it.</i>&nbsp;&nbsp;(⌐■_■)
+			<p>
+				The selected scale degrees (colored buttons above) match this scale:
+				<span id="matching-scales" style="font-weight:bold"></span>
+			</p>
+			<select id="scales">
+				<option></option>
+			</select>
+		</div>
 	</body>
 </html>
