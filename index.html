@@ -21,7 +21,7 @@
 		<script charset="utf-8">
 			$(document).ready(function() {
 				$.ajax({
-					url: "scales.tsv",
+					url: "wikiscales.tsv",
 					dataType: "text"
 				}).done(function(data){
 					var rows = data.split(/\r?\n|\r/);
@@ -73,7 +73,7 @@
 			});
 		</script>
 		<div>
-			<i>This isn't as clean an interface as the above, but I wanted more scales. Deal with it.</i>&nbsp;&nbsp;(⌐■_■)
+			<i>[WIP] This isn't as clean an interface as the above, but I wanted more scales....</i>
 			<p>
 				The selected scale degrees (colored buttons above) match this scale:
 				<span id="matching-scales" style="font-weight:bold"></span>

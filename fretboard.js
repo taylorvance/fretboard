@@ -45,7 +45,7 @@ window.onload = function() {
 
 	clickKey(keyButtons[0]);
 
-	ModeButton.allModes[0].click(); // ionian
+	ScaleButton.allScales[0].click(); // ionian
 
 	paper.view.draw();
 };
@@ -121,7 +121,7 @@ DegreeButton.allDegrees = [];
 DegreeButton.prototype.click = function() {
 	if(this.enabled) this.disable();
 	else this.enable();
-	if(ModeButton.enabledMode) ModeButton.enabledMode.disable();
+	if(ScaleButton.enabledScale) ScaleButton.enabledScale.disable();
 };
 DegreeButton.prototype.enable = function() {
 	this.grp.opacity = 1;
@@ -161,7 +161,7 @@ var btnTopLeft = {
 function drawButtons() {
 	drawDegrees();
 	drawKeys();
-	drawModes();
+	drawScales();
 }
 
 // based on this chart: http://danbecker.info/guitars/TriadArpeggios.png
@@ -233,46 +233,46 @@ function clickKey(grp) {
 }
 
 
-var modeWidth = 110;
-var ModeButton = function(x, y, name, intervals) {
+var scaleWidth = 110;
+var ScaleButton = function(x, y, name, intervals) {
 	this.name = name;
 	this.intervals = intervals;
 
 	var rect = new paper.Path.RoundRectangle(
-		new paper.Rectangle(new paper.Point(x, y), new paper.Point(x+modeWidth, y+2*buttonRadius)),
+		new paper.Rectangle(new paper.Point(x, y), new paper.Point(x+scaleWidth, y+2*buttonRadius)),
 		new paper.Size(buttonRadius, buttonRadius)
 	);
 	rect.strokeColor = '#333';
 	rect.strokeWidth = 2;
 
-	var text = new paper.PointText(new paper.Point(x+modeWidth/2, y + 20));//.hack
+	var text = new paper.PointText(new paper.Point(x+scaleWidth/2, y + 20));//.hack
 	text.content = this.name;
 	text.justification = 'center';
 	text.fontSize = 15;
 	text.fontWeight = 'bold';
 
 	var grp = new paper.Group([rect, text]);
-	var thisMode = this;
+	var thisScale = this;
 	grp.onClick = function(event) {
-		thisMode.click();
+		thisScale.click();
 	};
 
 	this.grp = grp;
 
 	this.disable();
 
-	ModeButton.allModes.push(this);
+	ScaleButton.allScales.push(this);
 };
-ModeButton.allModes = [];
-ModeButton.enabledMode = null;
-ModeButton.prototype.click = function() {
-	if(ModeButton.enabledMode !== this) this.enable();
+ScaleButton.allScales = [];
+ScaleButton.enabledScale = null;
+ScaleButton.prototype.click = function() {
+	if(ScaleButton.enabledScale !== this) this.enable();
 };
-ModeButton.prototype.enable = function() {
-	if(ModeButton.enabledMode) ModeButton.enabledMode.disable();
+ScaleButton.prototype.enable = function() {
+	if(ScaleButton.enabledScale) ScaleButton.enabledScale.disable();
 	this.grp.children[0].fillColor = '#333';
 	this.grp.children[1].fillColor = 'white';
-	ModeButton.enabledMode = this;
+	ScaleButton.enabledScale = this;
 
 	// disable degree buttons
 	DegreeButton.allDegrees.forEach(function(deg){
@@ -284,19 +284,19 @@ ModeButton.prototype.enable = function() {
 		DegreeButton.allDegrees[i].enable();
 	});
 };
-ModeButton.prototype.disable = function() {
+ScaleButton.prototype.disable = function() {
 	this.grp.children[0].fillColor = 'white';
 	this.grp.children[1].fillColor = '#333';
-	if(ModeButton.enabledMode === this) ModeButton.enabledMode = null;
+	if(ScaleButton.enabledScale === this) ScaleButton.enabledScale = null;
 };
 
-function drawModes() {
+function drawScales() {
 	var x = btnTopLeft.x;
 	var y = btnTopLeft.y;
 
 	// Diatonics
 	x += 2.5*8*buttonRadius;
-	var text = new paper.PointText(new paper.Point(x + modeWidth/2, y));
+	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
 	text.content = 'Diatonic';
 	text.justification = 'center';
 	text.fontSize = 20;
@@ -312,28 +312,28 @@ function drawModes() {
 		{name:'Locrian', intervals:[0,1,3,5,6,8,10]}
 	];
 	for (var i = 0, len = diatonics.length; i < len; i++) {
-		var btn = new ModeButton(x, y, diatonics[i].name, diatonics[i].intervals);
+		var btn = new ScaleButton(x, y, diatonics[i].name, diatonics[i].intervals);
 		y += 2.5*buttonRadius;
 	}
 
 	// Pentatonics
-	x += modeWidth + 2.5*buttonRadius;
+	x += scaleWidth + 2.5*buttonRadius;
 	y = btnTopLeft.y;
-	var text = new paper.PointText(new paper.Point(x + modeWidth/2, y));
+	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
 	text.content = 'Pentatonic';
 	text.justification = 'center';
 	text.fontSize = 20;
 	text.fontWeight = 'bold';
 	y += buttonRadius;
-	var btn = new ModeButton(x, y, 'Major', [0,2,4,7,9]);
+	var btn = new ScaleButton(x, y, 'Major', [0,2,4,7,9]);
 	y += 2.5*buttonRadius;
-	var btn = new ModeButton(x, y, 'Minor', [0,3,5,7,10]);
+	var btn = new ScaleButton(x, y, 'Minor', [0,3,5,7,10]);
 
 	// Triads
-	x += modeWidth + 2.5*buttonRadius;
+	x += scaleWidth + 2.5*buttonRadius;
 	y = btnTopLeft.y;
-	var text = new paper.PointText(new paper.Point(x + modeWidth/2, y));
-	text.content = 'Triad';
+	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
+	text.content = 'Triads';
 	text.justification = 'center';
 	text.fontSize = 20;
 	text.fontWeight = 'bold';
@@ -347,14 +347,15 @@ function drawModes() {
 		{name:'Suspended 4', intervals:[0,5,7]},
 	];
 	for (var i = 0, len = triads.length; i < len; i++) {
-		var btn = new ModeButton(x, y, triads[i].name, triads[i].intervals);
+		var btn = new ScaleButton(x, y, triads[i].name, triads[i].intervals);
 		y += 2.5*buttonRadius;
 	}
 
+	/*
 	// Chord Ornaments
-	x += modeWidth + 2.5*buttonRadius;
+	x += scaleWidth + 2.5*buttonRadius;
 	y = btnTopLeft.y;
-	var text = new paper.PointText(new paper.Point(x + modeWidth/2, y));
+	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
 	text.content = 'Ornaments';
 	text.justification = 'center';
 	text.fontSize = 20;
@@ -368,15 +369,30 @@ function drawModes() {
 		{name:'add11', intervals:[0,4,5,7]},
 	];
 	for (var i = 0, len = chords.length; i < len; i++) {
-		var btn = new ModeButton(x, y, chords[i].name, chords[i].intervals);
+		var btn = new ScaleButton(x, y, chords[i].name, chords[i].intervals);
 		y += 2.5*buttonRadius;
 	}
+	*/
 
-	// Chromatic
-	x += modeWidth + 2.5*buttonRadius;
+	// Other
+	x += scaleWidth + 2.5*buttonRadius;
 	y = btnTopLeft.y;
+	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
+	text.content = 'Other Scales';
+	text.justification = 'center';
+	text.fontSize = 20;
+	text.fontWeight = 'bold';
 	y += buttonRadius;
-	var btn = new ModeButton(x, y, 'Chromatic', [0,1,2,3,4,5,6,7,8,9,10,11]);
+	var chords = [
+		{name:'Chromatic', intervals:[0,1,2,3,4,5,6,7,8,9,10,11]},
+		{name:'Blues', intervals:[0,3,5,6,7,10]},
+		{name:'Mixolydian b6', intervals:[0,2,4,5,7,8,10]},
+		{name:'Phrygian Dom', intervals:[0,1,4,5,7,8,10]},
+	];
+	for (var i = 0, len = chords.length; i < len; i++) {
+		var btn = new ScaleButton(x, y, chords[i].name, chords[i].intervals);
+		y += 2.5*buttonRadius;
+	}
 }
 
 
