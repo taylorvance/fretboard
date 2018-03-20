@@ -444,7 +444,6 @@ function drawPlayButtons() {
 	grp.onClick = function(event) { playScale(); };
 
 
-	return;//.del
 	x += playBtnWidth + 2*buttonRadius;
 
 	var rect = new paper.Path.RoundRectangle(
@@ -568,12 +567,12 @@ function playTriads() {
 	delay += doubleDuration;
 
 	// set timeouts for each chord
-	for (var i = 0, len = frequencies.length; i < len; i++) {
-		setTimeout(function(){
+	for (var i = 1, len = frequencies.length; i < len; i++) {
+		setTimeout(function(i){
 			playNote(frequencies[(i+0) % frequencies.length], duration);
 			playNote(frequencies[(i+2) % frequencies.length], duration);
 			playNote(frequencies[(i+4) % frequencies.length], duration);
-		}, delay);
+		}, delay, i);
 		delay += duration;
 	}
 
