@@ -21,7 +21,7 @@
 		<script charset="utf-8">
 			$(document).ready(function() {
 				$.ajax({
-					url: "wikiscales.tsv",
+					url: "scales.tsv",
 					dataType: "text"
 				}).done(function(data){
 					var rows = data.split(/\r?\n|\r/);
@@ -33,7 +33,8 @@
 
 				// Update selected degrees when a scale is selected from the dropdown.
 				$("#scales").change(function(){
-					DegreeButton.allDegrees.forEach(function(deg){
+					if(ScaleButton.enabledScale) ScaleButton.enabledScale.disable();
+					DegreeButton.enabledDegrees.forEach(function(deg){
 						deg.disable();
 					});
 
