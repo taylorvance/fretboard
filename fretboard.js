@@ -444,6 +444,7 @@ function drawPlayButtons() {
 	grp.onClick = function(event) { playScale(); };
 
 
+	return;//.del
 	x += playBtnWidth + 2*buttonRadius;
 
 	var rect = new paper.Path.RoundRectangle(
@@ -476,7 +477,7 @@ function playNote(frequency, duration) {
 function getEnabledDegrees() {
 	var degs = [];
 	DegreeButton.enabledDegrees.forEach(function(deg){
-		degs.push(deg.myIndex);
+		if(degs.indexOf(deg.myIndex) === -1) parseInt(degs.push(deg.myIndex));
 	});
 	return degs.sort();
 }
@@ -641,8 +642,7 @@ function redrawKeyLines() {
 	});
 
 	var rootIdx = KEYS.indexOf(selectedKey);
-	var degs = getEnabledDegrees();
-	degs.forEach(function(deg){
+	getEnabledDegrees().forEach(function(deg){
 		keyButtons[(rootIdx + deg) % keyButtons.length].children[2].opacity = 1;
 	});
 }
