@@ -111,12 +111,14 @@ DegreeButton.prototype.enable = function() {
 	DegreeButton.enabledDegrees.push(this);
 	this.enabled = true;
 	redrawNotes();
+	redrawKeyLines();
 };
 DegreeButton.prototype.disable = function() {
 	this.grp.opacity = 0.1;
 	DegreeButton.enabledDegrees.splice(DegreeButton.enabledDegrees.indexOf(this), 1);
 	this.enabled = false;
 	redrawNotes();
+	redrawKeyLines();
 };
 
 
@@ -178,6 +180,15 @@ function drawKeys() {
 		var x = midX + keyWheelRadius * Math.cos(theta);
 		var y = midY + keyWheelRadius * Math.sin(theta);
 
+		var line = new paper.Path();
+		line.strokeColor = stringColor;
+		var start = new paper.Point(midX, midY);
+		line.moveTo(start);
+		//line.lineTo([x, y]);
+		line.lineTo([midX + (keyWheelRadius-buttonRadius-1) * Math.cos(theta), midY + (keyWheelRadius-buttonRadius-1) * Math.sin(theta)]);
+		line.strokeColor = '#333';
+		line.strokeWidth = 2;
+
 		var circle = new paper.Path.Circle(new paper.Point(x, y), buttonRadius);
 		circle.fillColor = 'white';
 		circle.strokeColor = '#333';
@@ -190,7 +201,7 @@ function drawKeys() {
 		text.fontSize = 15;
 		text.fontWeight = 'bold';
 
-		var grp = new paper.Group([circle, text]);
+		var grp = new paper.Group([circle, text, line]);
 		grp.onClick = function(event) {
 			clickKey(this);
 		};
@@ -213,6 +224,7 @@ function clickKey(grp) {
 		grp.children[1].fillColor = 'white';
 
 		redrawNotes();
+		redrawKeyLines();
 	}
 }
 
@@ -622,6 +634,18 @@ function redrawNotes() {
 			}
 		}
 	}
+}
+
+function redrawKeyLines() {
+	keyButtons.forEach(function(grp){
+		grp.children[2].opacity = 0;
+	});
+
+	var rootIdx = KEYS.indexOf(selectedKey);
+	var degs = getEnabledDegrees();
+	degs.forEach(function(deg){
+		keyButtons[(rootIdx + deg) % keyButtons.length].children[2].opacity = 1;
+	});
 }
 
 
