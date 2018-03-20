@@ -524,7 +524,7 @@ function playScale() {
 	delay += doubleDuration;
 
 	// set timeouts for each note (desc)
-	frequencies.reverse().slice(0, -1).forEach(function(hz){
+	frequencies.slice(1).reverse().forEach(function(hz){
 		setTimeout(function(){
 			playNote(hz, duration);
 		}, delay);
