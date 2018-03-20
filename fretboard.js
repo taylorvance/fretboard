@@ -13,23 +13,10 @@ var stringColor = '#bbb';
 var stringDist = 25;
 var stringWidth = 1.5;
 
-var markerColor = '#ccc';
+var markerColor = '#ddd';
 
 var noteRadius = 8;
 var noteOffset = noteRadius * 1.3;
-
-/*
-var frets = {};
-for (var string = 1; string <= 6; string++) {
-	for (var fret = 0; fret <= 22; fret++) {
-		frets[fret][string] = {
-			x: topLeft.x,
-			y: topLeft.y
-		};
-	}
-}
-console.log(frets);
-*/
 
 
 window.onload = function() {
@@ -38,10 +25,6 @@ window.onload = function() {
 
 	drawFretboard();
 	drawButtons();
-
-	//clickDegree(degreeButtons[0].grp);
-	//clickDegree(degreeButtons[4].grp);
-	//clickDegree(degreeButtons[7].grp);
 
 	clickKey(keyButtons[0]);
 
@@ -154,7 +137,7 @@ var degreeButtons = [
 	{label:'b7', color:'#c0f', relx:5.5},
 	{label:'7', color:'#f0f', relx:6}
 ];
-var btnTopLeft = {
+var belowFretboard = {
 	x: topLeft.x + fretDist/2,
 	y: topLeft.y + 5*stringDist + 3*buttonRadius
 };
@@ -162,6 +145,7 @@ function drawButtons() {
 	drawDegrees();
 	drawKeys();
 	drawScales();
+	drawPlayButtons();
 }
 
 // based on this chart: http://danbecker.info/guitars/TriadArpeggios.png
@@ -169,8 +153,8 @@ function drawDegrees() {
 	for (var i = 0, len = degreeButtons.length; i < len; i++) {
 		var button = degreeButtons[i];
 
-		var x = btnTopLeft.x + 2.5*button.relx*buttonRadius;
-		var y = btnTopLeft.y;
+		var x = belowFretboard.x + 2.5*button.relx*buttonRadius;
+		var y = belowFretboard.y;
 		if(button.label.length !== 1) {//.hack
 			y += 1.8 * buttonRadius;
 		}
@@ -182,8 +166,8 @@ function drawDegrees() {
 var keyWheelRadius = 80;
 var keyButtons = [];
 function drawKeys() {
-	var midX = btnTopLeft.x + 2.5*3*buttonRadius;
-	var midY = btnTopLeft.y + 2.5*2*buttonRadius + keyWheelRadius;
+	var midX = belowFretboard.x + 2.5*3*buttonRadius;
+	var midY = belowFretboard.y + 2.5*2*buttonRadius + keyWheelRadius;
 
 	keyButtons = [];
 
@@ -291,11 +275,11 @@ ScaleButton.prototype.disable = function() {
 };
 
 function drawScales() {
-	var x = btnTopLeft.x;
-	var y = btnTopLeft.y;
+	var x = belowFretboard.x;
+	var y = belowFretboard.y;
 
 	// Diatonics
-	x += 2.5*8*buttonRadius;
+	x += 2*9*buttonRadius;
 	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
 	text.content = 'Diatonic';
 	text.justification = 'center';
@@ -317,8 +301,8 @@ function drawScales() {
 	}
 
 	// Pentatonics
-	x += scaleWidth + 2.5*buttonRadius;
-	y = btnTopLeft.y;
+	x += scaleWidth + 2*buttonRadius;
+	y = belowFretboard.y;
 	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
 	text.content = 'Pentatonic';
 	text.justification = 'center';
@@ -330,8 +314,8 @@ function drawScales() {
 	var btn = new ScaleButton(x, y, 'Minor', [0,3,5,7,10]);
 
 	// Triads
-	x += scaleWidth + 2.5*buttonRadius;
-	y = btnTopLeft.y;
+	x += scaleWidth + 2*buttonRadius;
+	y = belowFretboard.y;
 	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
 	text.content = 'Triads';
 	text.justification = 'center';
@@ -351,10 +335,40 @@ function drawScales() {
 		y += 2.5*buttonRadius;
 	}
 
+	// Intervals
+	x += scaleWidth + 2*buttonRadius;
+	y = belowFretboard.y;
+	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
+	text.content = 'Intervals';
+	text.justification = 'center';
+	text.fontSize = 20;
+	text.fontWeight = 'bold';
+	y += buttonRadius;
+	var intervals = [
+		/*
+		{name:'(p)erfect', intervals:[0,5,7]},
+		{name:'(m)ajor', intervals:[0,4,8]},
+		{name:'mi(n)or', intervals:[0,3,9]},
+		{name:'(s)econd', intervals:[0,2,10]},
+		{name:'(d)iminished', intervals:[0,1,11]},
+		{name:'(t)ritone', intervals:[0,6]},
+		*/
+		{name:'P4 / P5', intervals:[0,5,7]},
+		{name:'M3 / m6', intervals:[0,4,8]},
+		{name:'m3 / M6', intervals:[0,3,9]},
+		{name:'M2 / m7', intervals:[0,2,10]},
+		{name:'m2 / M7', intervals:[0,1,11]},
+		{name:'Tritone', intervals:[0,6]},
+	];
+	for (var i = 0, len = intervals.length; i < len; i++) {
+		var btn = new ScaleButton(x, y, intervals[i].name, intervals[i].intervals);
+		y += 2.5*buttonRadius;
+	}
+
 	/*
 	// Chord Ornaments
-	x += scaleWidth + 2.5*buttonRadius;
-	y = btnTopLeft.y;
+	x += scaleWidth + 2*buttonRadius;
+	y = belowFretboard.y;
 	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
 	text.content = 'Ornaments';
 	text.justification = 'center';
@@ -375,10 +389,10 @@ function drawScales() {
 	*/
 
 	// Other
-	x += scaleWidth + 2.5*buttonRadius;
-	y = btnTopLeft.y;
+	x += scaleWidth + 2*buttonRadius;
+	y = belowFretboard.y;
 	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
-	text.content = 'Other Scales';
+	text.content = 'Other';
 	text.justification = 'center';
 	text.fontSize = 20;
 	text.fontWeight = 'bold';
@@ -395,6 +409,176 @@ function drawScales() {
 	}
 }
 
+function drawPlayButtons() {
+	var x = belowFretboard.x;
+	var y = belowFretboard.y + 7*buttonRadius + 2*keyWheelRadius;
+
+	var playBtnWidth = scaleWidth - buttonRadius;
+
+	var rect = new paper.Path.RoundRectangle(
+		new paper.Rectangle(new paper.Point(x, y), new paper.Point(x+playBtnWidth, y+2*buttonRadius)),
+		new paper.Size(buttonRadius, buttonRadius)
+	);
+	rect.strokeColor = '#333';
+	rect.strokeWidth = 2;
+
+	var text = new paper.PointText(new paper.Point(x+playBtnWidth/2, y + 20));
+	text.content = 'Play Scale';
+	text.justification = 'center';
+	text.fontSize = 15;
+	text.fontWeight = 'bold';
+
+	var grp = new paper.Group([rect, text]);
+	grp.onClick = function(event) { playScale(); };
+
+
+	return;//.del
+	x += playBtnWidth + 2*buttonRadius;
+
+	var rect = new paper.Path.RoundRectangle(
+		new paper.Rectangle(new paper.Point(x, y), new paper.Point(x+playBtnWidth, y+2*buttonRadius)),
+		new paper.Size(buttonRadius, buttonRadius)
+	);
+	rect.strokeColor = '#333';
+	rect.strokeWidth = 2;
+
+	var text = new paper.PointText(new paper.Point(x+playBtnWidth/2, y + 20));
+	text.content = 'Play Triads';
+	text.justification = 'center';
+	text.fontSize = 15;
+	text.fontWeight = 'bold';
+
+	var grp = new paper.Group([rect, text]);
+	grp.onClick = function(event) { playTriads(); };
+}
+
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playNote(frequency, duration) {
+	var oscillator = audioCtx.createOscillator();
+	//oscillator.type = 'square';
+	oscillator.frequency.value = frequency; // value in hertz
+	oscillator.connect(audioCtx.destination);
+	oscillator.start();
+	setTimeout(function(){ oscillator.stop(); }, duration);
+}
+
+function getEnabledDegrees() {
+	var degs = [];
+	DegreeButton.enabledDegrees.forEach(function(deg){
+		degs.push(deg.myIndex);
+	});
+	return degs.sort();
+}
+function playScale() {
+	var rootIdx = KEYS.indexOf(selectedKey);
+	if(rootIdx === -1) {
+		alert("Select a key to play the scale.");
+		return;
+	}
+
+	var frequencies = [];
+	var containsRoot = false;
+	getEnabledDegrees().forEach(function(deg){
+		frequencies.push(calcHz(rootIdx + deg - fixedNoteIdx));
+		if(deg === 0) containsRoot = true;
+	});
+	frequencies.sort();
+
+	if(!containsRoot) {
+		alert("Root must be enabled to play the scale.");
+		return;
+	}
+
+	var duration = 300;
+	var delay = 0;
+
+	// play root twice as long
+	var doubleDuration = 2 * duration;
+	playNote(frequencies[0], doubleDuration);
+	delay += doubleDuration;
+
+	// set timeouts for each note (asc)
+	frequencies.slice(1).forEach(function(hz){
+		setTimeout(function(){
+			playNote(hz, duration);
+		}, delay);
+		delay += duration;
+	});
+
+	// play the octave twice as long
+	setTimeout(function(){
+		playNote(calcHz(rootIdx + 12 - fixedNoteIdx), doubleDuration);
+	}, delay);
+	delay += doubleDuration;
+
+	// set timeouts for each note (desc)
+	frequencies.reverse().slice(0, -1).forEach(function(hz){
+		setTimeout(function(){
+			playNote(hz, duration);
+		}, delay);
+		delay += duration;
+	});
+
+	// play the root again twice as long
+	setTimeout(function(){
+		playNote(frequencies[0], doubleDuration);
+	}, delay);
+}
+
+function playTriads() {
+	var rootIdx = KEYS.indexOf(selectedKey);
+	if(rootIdx === -1) {
+		alert("Select a key to play the triads.");
+		return;
+	}
+
+	var frequencies = [];
+	var containsRoot = false;
+	getEnabledDegrees().forEach(function(deg){
+		frequencies.push(calcHz(rootIdx + deg - fixedNoteIdx));
+		if(deg === 0) containsRoot = true;
+	});
+	frequencies.sort();
+
+	if(!containsRoot) {
+		alert("Root must be enabled to play triads.");
+		return;
+	}
+
+	var duration = 300;
+	var delay = 0;
+
+	// play the I chord twice as long
+	var doubleDuration = 2 * duration;
+	playNote(frequencies[0 % frequencies.length], doubleDuration);
+	playNote(frequencies[2 % frequencies.length], doubleDuration);
+	playNote(frequencies[4 % frequencies.length], doubleDuration);
+	delay += doubleDuration;
+
+	// set timeouts for each chord
+	for (var i = 0, len = frequencies.length; i < len; i++) {
+		setTimeout(function(){
+			playNote(frequencies[(i+0) % frequencies.length], duration);
+			playNote(frequencies[(i+2) % frequencies.length], duration);
+			playNote(frequencies[(i+4) % frequencies.length], duration);
+		}, delay);
+		delay += duration;
+	}
+
+	// play the I again twice as long
+	setTimeout(function(){
+		playNote(frequencies[0 % frequencies.length], doubleDuration);
+		playNote(frequencies[2 % frequencies.length], doubleDuration);
+		playNote(frequencies[4 % frequencies.length], doubleDuration);
+	}, delay);
+}
+
+var fixedNoteIdx = KEYS.indexOf('A');
+var fixedNoteFreq = 440; // A4
+function calcHz(halfSteps) {
+	return fixedNoteFreq * Math.pow(Math.pow(2, 1/12), halfSteps);
+}
+
 
 var drawnNotes = [];
 function redrawNotes() {
@@ -405,7 +589,7 @@ function redrawNotes() {
 	//console.log(rootIdx, selectedKey);
 	if(rootIdx !== -1) {
 		// remove existing notes
-		for (note in drawnNotes){
+		for (note in drawnNotes) {
 			drawnNotes.splice(drawnNotes.indexOf(note), 1);
 			note.remove();
 		}
