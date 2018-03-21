@@ -1,9 +1,10 @@
 //const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const KEYS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 var stringNotes = {1:'E', 2:'A', 3:'D', 4:'G', 5:'B', 6:'E'};
-/*                     1      m2       2      m3       3       4       T       5      m6       6      m7       7 */
-var degreeColors = ['#f00', '#07b', '#   ', '#990', '#ee0', '#0d0', '#099', '#00f', '#   ', '#   ', '#   ', '#f0c'];
-var degreeColors = ['#f00', '#f60', '#f80', '#fc0', '#ee0', '#0d0', '#0ed', '#00f', '#64f', '#80f', '#c0f', '#f0f'];
+/*                     1      m2      M2      m3      M3      P4       T      P5      m6      M6      m7      M7 */
+var degreeColors = ['#f00', '#730', '#850', '#a70', '#ee0', '#0d0', '#0ed', '#00f', '#64f', '#70b', '#608', '#505']; // dissonance darker
+var degreeColors = ['#f00', '#900', '#f80', '#070', '#0d0', '#ee0', '#167', '#00f', '#40a', '#a0f', '#a08', '#f0a']; // flats darker
+var degreeColors = ['#f00', '#f60', '#f80', '#fc0', '#ee0', '#0d0', '#0ed', '#00f', '#64f', '#80f', '#c0f', '#f0f']; // standard rainbow
 
 var topLeft = {x:50, y:30};
 
