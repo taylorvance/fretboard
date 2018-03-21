@@ -1,6 +1,9 @@
 //const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const KEYS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 var stringNotes = {1:'E', 2:'A', 3:'D', 4:'G', 5:'B', 6:'E'};
+/*                     1      m2       2      m3       3       4       T       5      m6       6      m7       7 */
+var degreeColors = ['#f00', '#07b', '#   ', '#990', '#ee0', '#0d0', '#099', '#00f', '#   ', '#   ', '#   ', '#f0c'];
+var degreeColors = ['#f00', '#f60', '#f80', '#fc0', '#ee0', '#0d0', '#0ed', '#00f', '#64f', '#80f', '#c0f', '#f0f'];
 
 var topLeft = {x:50, y:30};
 
@@ -26,8 +29,8 @@ window.onload = function() {
 	drawFretboard();
 	drawButtons();
 
-	KeyButton.allKeys[0].select(); // C
-	ScaleButton.allScales[0].click(); // Ionian
+	clickKey(keyButtons[0]); // C
+	ScaleButton.allScales[0].click(); // ionian
 
 	paper.view.draw();
 };
@@ -110,6 +113,7 @@ DegreeButton.prototype.enable = function() {
 	DegreeButton.enabledDegrees.push(this);
 	this.enabled = true;
 	redrawNotes();
+	enableKeyButton((KEYS.indexOf(selectedKey) + this.myIndex) % KEYS.length);
 	redrawKeyLines();
 };
 DegreeButton.prototype.disable = function() {
@@ -117,6 +121,7 @@ DegreeButton.prototype.disable = function() {
 	DegreeButton.enabledDegrees.splice(DegreeButton.enabledDegrees.indexOf(this), 1);
 	this.enabled = false;
 	redrawNotes();
+	disableKeyButton((KEYS.indexOf(selectedKey) + this.myIndex) % KEYS.length);
 	redrawKeyLines();
 };
 
@@ -125,18 +130,18 @@ DegreeButton.prototype.disable = function() {
 
 
 var degreeButtons = [
-	{label:'R', color:'#f00', relx:0},
-	{label:'b2', color:'#f60', relx:0.5},
-	{label:'2', color:'#f80', relx:1},
-	{label:'b3', color:'#fc0', relx:1.5},
-	{label:'3', color:'#ee0', relx:2},
-	{label:'4', color:'#0d0', relx:3},
-	{label:'#4', color:'#0ed', relx:3.5},//.change label based on lyd (#4) vs loc (b5)
-	{label:'5', color:'#00f', relx:4},
-	{label:'b6', color:'#64f', relx:4.5},//.change label based on aug (#5) vs all else (b6)
-	{label:'6', color:'#80f', relx:5},
-	{label:'b7', color:'#c0f', relx:5.5},
-	{label:'7', color:'#f0f', relx:6}
+	{label:'R', relx:0},
+	{label:'b2', relx:0.5},
+	{label:'2', relx:1},
+	{label:'b3', relx:1.5},
+	{label:'3', relx:2},
+	{label:'4', relx:3},
+	{label:'#4', relx:3.5},//.change label based on lyd (#4) vs loc (b5)
+	{label:'5', relx:4},
+	{label:'b6', relx:4.5},//.change label based on aug (#5) vs all else (b6)
+	{label:'6', relx:5},
+	{label:'b7', relx:5.5},
+	{label:'7', relx:6}
 ];
 var belowFretboard = {
 	x: topLeft.x + fretDist/2,
@@ -156,99 +161,103 @@ function drawDegrees() {
 
 		var x = belowFretboard.x + 2.5*button.relx*buttonRadius;
 		var y = belowFretboard.y;
-		if(button.label.length !== 1) {//.hack
+		if(button.label.length === 1) {//.hack
 			y += 1.8 * buttonRadius;
 		}
 
-		var degBtn = new DegreeButton(x, y, button.label, button.color, i);
+		var degBtn = new DegreeButton(x, y, button.label, degreeColors[i], i);
 	}
 }
 
 var keyWheelRadius = 80;
+var keyButtons = [];
 function drawKeys() {
 	var midX = belowFretboard.x + 2.5*3*buttonRadius;
 	var midY = belowFretboard.y + 2.5*2*buttonRadius + keyWheelRadius;
 
 	for (i in KEYS) {
-		var label = KEYS[i];
-		var theta = i * 2 * Math.PI / 12 - (Math.PI / 2);
-		var keyBtn = new KeyButton(midX, midY, theta, label, i);
-	}
+		var key = KEYS[i];
 
-	KeyButton.allKeys[0].select();//.hack
-	KeyButton.recolorKeys();
+		var theta = i * 2 * Math.PI / 12 - (Math.PI / 2);
+		var x = midX + keyWheelRadius * Math.cos(theta);
+		var y = midY + keyWheelRadius * Math.sin(theta);
+
+		var line = new paper.Path();
+		line.strokeColor = stringColor;
+		var start = new paper.Point(midX, midY);
+		line.moveTo(start);
+		line.lineTo([
+			midX + (keyWheelRadius-buttonRadius) * Math.cos(theta),
+			midY + (keyWheelRadius-buttonRadius) * Math.sin(theta)
+		]);
+		line.strokeColor = '#333';
+		line.strokeWidth = 2;
+
+		var circle = new paper.Path.Circle(new paper.Point(x, y), buttonRadius);
+		circle.fillColor = 'white';
+		circle.strokeColor = '#333';
+		//circle.strokeWidth = 2;
+
+		var text = new paper.PointText(new paper.Point(x, y + 5));//.hack
+		//text.fillColor = '#333';
+		text.fillColor = 'white';
+		text.content = key;
+		text.justification = 'center';
+		text.fontSize = 15;
+		text.fontWeight = 'bold';
+
+		var grp = new paper.Group([circle, text, line]);
+		grp.onClick = function(event) {
+			clickKey(this);
+		};
+
+		keyButtons.push(grp);
+	}
 }
 
+var selectedKey = '';
+function clickKey(grp) {
+	if(selectedKey != grp.children[1].content) {
+		selectedKey = grp.children[1].content;
 
-var KeyButton = function(midX, midY, theta, label, i) {
-	this.label = label;
+		var rootIdx = KEYS.indexOf(selectedKey);
+		var degs = getEnabledDegrees();
 
-	var x = midX + keyWheelRadius * Math.cos(theta);
-	var y = midY + keyWheelRadius * Math.sin(theta);
+		for (var i = 0, len = KEYS.length; i < len; i++) {
+			var keyIdx = (rootIdx + i) % len;
+			var keyGrp = keyButtons[keyIdx];
+			//keyGrp.children[0].fillColor = 'white';
+			//keyGrp.children[1].fillColor = '#333';
+			keyGrp.children[0].fillColor = DegreeButton.allDegrees[i].color;
+			keyGrp.children[0].strokeWidth = 0;
+			if(degs.indexOf(i) === -1) {
+				disableKeyButton(keyIdx);
+			} else {
+				enableKeyButton(keyIdx);
+			}
+		}
 
-	var line = new paper.Path();
-	line.moveTo(new paper.Point(midX, midY));
-	line.lineTo([
-		midX + (keyWheelRadius-buttonRadius) * Math.cos(theta),
-		midY + (keyWheelRadius-buttonRadius) * Math.sin(theta)
-	]);
-	line.strokeColor = '#333';
-	line.strokeWidth = 2;
-
-	var circle = new paper.Path.Circle(new paper.Point(x, y), buttonRadius);
-	circle.fillColor = '#eee';
-	circle.strokeColor = '#333';
-	circle.strokeWidth = 2;
-
-	var text = new paper.PointText(new paper.Point(x, y + 5));//.hack
-	//text.fillColor = '#333';
-	text.fillColor = 'white';
-	text.content = label;
-	text.justification = 'center';
-	text.fontSize = 15;
-	text.fontWeight = 'bold';
-
-	var grp = new paper.Group([circle, text, line]);
-	var thisKeyBtn = this;
-	grp.onClick = function(event) {
-		thisKeyBtn.select();
-	};
-
-	this.myIndex = i;//.terrible hack
-
-	this.grp = grp;
-
-	KeyButton.allKeys.push(this);
-};
-KeyButton.selectedKey = null;
-KeyButton.allKeys = [];
-KeyButton.prototype.select = function() {
-	if(KeyButton.selectedKey != this) {
-		KeyButton.selectedKey = this;
-
-		KeyButton.recolorKeys();
+		//grp.children[0].fillColor = '#333';
+		//grp.children[1].fillColor = 'white';
+		grp.children[0].strokeWidth = 3;
 
 		redrawNotes();
-		redrawKeyLines();
 	}
-};
-KeyButton.recolorKeys = function() {
-	console.log('recoloring');
-	var degs = getEnabledDegrees();
-
-	for (var i = 0, len = KEYS.length; i < len; i++) {
-		var keyGrp = KeyButton.allKeys[(KeyButton.selectedKey.myIndex + i) % len].grp;
-		keyGrp.children[0].fillColor = DegreeButton.allDegrees[i].color;
-		keyGrp.children[0].strokeWidth = 0;
-		if(degs.indexOf(i) !== -1) {
-			keyGrp.children[0].opacity = 1;
-		} else {
-			keyGrp.children[0].opacity = 0.1;
-		}
+}
+function enableKeyButton(idx) {
+	if(keyButtons[idx]) {
+		var grp = keyButtons[idx];
+		grp.children[0].opacity = 1;
 	}
-
-	KeyButton.selectedKey.grp.children[0].strokeWidth = 3;
-};
+	redrawKeyLines();
+}
+function disableKeyButton(idx) {
+	if(keyButtons[idx]) {
+		var grp = keyButtons[idx];
+		grp.children[0].opacity = 0.1;
+	}
+	redrawKeyLines();
+}
 
 
 var scaleWidth = 110;
@@ -504,7 +513,7 @@ function getEnabledDegrees() {
 	return degs.sort();
 }
 function playScale() {
-	var rootIdx = KeyButton.selectedKey.myIndex;
+	var rootIdx = KEYS.indexOf(selectedKey);
 	if(rootIdx === -1) {
 		alert("Select a key to play the scale.");
 		return;
@@ -560,7 +569,7 @@ function playScale() {
 }
 
 function playTriads() {
-	var rootIdx = KeyButton.selectedKey.myIndex;
+	var rootIdx = KEYS.indexOf(selectedKey);
 	if(rootIdx === -1) {
 		alert("Select a key to play the triads.");
 		return;
@@ -619,10 +628,8 @@ function redrawNotes() {
 	drawnNotes.forEach(function(note){ note.remove(); });
 	drawnNotes = [];
 
-	var rootIdx;
-	if(KeyButton.selectedKey) {
-		rootIdx = KeyButton.selectedKey.myIndex;
-	}
+	var rootIdx = KEYS.indexOf(selectedKey);
+	//console.log(rootIdx, selectedKey);
 	if(rootIdx !== -1) {
 		// remove existing notes
 		for (note in drawnNotes) {
@@ -661,16 +668,16 @@ function redrawNotes() {
 }
 
 function redrawKeyLines() {
-	KeyButton.allKeys.forEach(function(keyBtn){
-		keyBtn.grp.children[2].opacity = 0;
+	// hide all lines
+	keyButtons.forEach(function(grp){
+		grp.children[2].opacity = 0;
 	});
 
-	if(KeyButton.selectedKey) {
-		var rootIdx = KeyButton.selectedKey.myIndex;
-		getEnabledDegrees().forEach(function(deg){
-			KeyButton.allKeys[(rootIdx + deg) % KeyButton.allKeys.length].grp.children[2].opacity = 1;
-		});
-	}
+	// show lines for enabled degrees
+	var rootIdx = KEYS.indexOf(selectedKey);
+	getEnabledDegrees().forEach(function(deg){
+		keyButtons[(rootIdx + deg) % KEYS.length].children[2].opacity = 1;
+	});
 }
 
 
