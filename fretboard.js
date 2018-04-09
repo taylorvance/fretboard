@@ -1,10 +1,16 @@
 //const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const KEYS = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 var stringNotes = {1:'E', 2:'A', 3:'D', 4:'G', 5:'B', 6:'E'};
+
 /*                     1      m2      M2      m3      M3      P4       T      P5      m6      M6      m7      M7 */
+var degreeColors = ['#f00', '#f60', '#f80', '#fc0', '#ee0', '#0d0', '#0ed', '#00f', '#64f', '#80f', '#c0f', '#f0f']; // standard rainbow
 var degreeColors = ['#f00', '#730', '#850', '#a70', '#ee0', '#0d0', '#0ed', '#00f', '#64f', '#70b', '#608', '#505']; // dissonance darker
 var degreeColors = ['#f00', '#900', '#f80', '#070', '#0d0', '#ee0', '#167', '#00f', '#40a', '#a0f', '#a08', '#f0a']; // flats darker
-var degreeColors = ['#f00', '#f60', '#f80', '#fc0', '#ee0', '#0d0', '#0ed', '#00f', '#64f', '#80f', '#c0f', '#f0f']; // standard rainbow
+/*                      1          m2         M2         m3         M3         P4         T          P5         m6         M6         m7         M7 */
+var degreeColors = ['#ff0000', '#e67300', '#cccc00', '#59b300', '#009900', '#008040', '#006666', '#004080', '#000099', '#5900b3', '#cc00cc', '#e60073']; // brightness
+var degreeColors = ['#ff0000', '#ff8c1a', '#ffff33', '#a6ff4d', '#66ff66', '#80ffbf', '#99ffff', '#80bfff', '#6666ff', '#a64dff', '#ff33ff', '#ff1a8c']; // saturation
+var degreeColors = ['#ff0000', '#ff8000', '#ffff00', '#80ff00', '#00ff00', '#00ff80', '#00ffff', '#0080ff', '#0000ff', '#8000ff', '#ff00ff', '#ff0080']; // equal temperament
+var degreeColors = ['#ff0000', '#ff8000', '#f8f800', '#88ff00', '#00f800', '#00ffc0', '#00f8f8', '#0080ff', '#0000ff', '#8000ff', '#ff00ff', '#ff0080']; // equalish temperament
 
 var topLeft = {x:50, y:30};
 
@@ -369,13 +375,34 @@ function drawScales() {
 	var triads = [
 		{name:'Major', intervals:[0,4,7]},
 		{name:'Minor', intervals:[0,3,7]},
-		{name:'Augmented', intervals:[0,4,8]},
 		{name:'Diminished', intervals:[0,3,6]},
-		{name:'Suspended 2', intervals:[0,2,7]},
+		{name:'Augmented', intervals:[0,4,8]},
 		{name:'Suspended 4', intervals:[0,5,7]},
+		{name:'Suspended 2', intervals:[0,2,7]},
 	];
 	for (var i = 0, len = triads.length; i < len; i++) {
 		var btn = new ScaleButton(x, y, triads[i].name, triads[i].intervals);
+		y += 2.5*buttonRadius;
+	}
+
+	// Seventh Chords
+	x += scaleWidth + 2*buttonRadius;
+	y = belowFretboard.y;
+	var text = new paper.PointText(new paper.Point(x + scaleWidth/2, y));
+	text.content = '7th Chords';
+	text.justification = 'center';
+	text.fontSize = 20;
+	text.fontWeight = 'bold';
+	y += buttonRadius;
+	var sevenths = [
+		{name:'Dominant (7)', intervals:[0,4,7,10]},
+		{name:'Major (M7)', intervals:[0,4,7,11]},
+		{name:'Minor (m7)', intervals:[0,3,7,10]},
+		{name:'Half-dim (Ø7)', intervals:[0,3,6,10]},
+		{name:'Dim (º7)', intervals:[0,3,6,9]}
+	];
+	for (var i = 0, len = sevenths.length; i < len; i++) {
+		var btn = new ScaleButton(x, y, sevenths[i].name, sevenths[i].intervals);
 		y += 2.5*buttonRadius;
 	}
 
@@ -511,7 +538,7 @@ function getEnabledDegrees() {
 	DegreeButton.enabledDegrees.forEach(function(deg){
 		if(degs.indexOf(deg.myIndex) === -1) parseInt(degs.push(deg.myIndex));
 	});
-	return degs.sort();
+	return degs.sort(function(a,b){return a-b});
 }
 function playScale() {
 	var rootIdx = KEYS.indexOf(selectedKey);
